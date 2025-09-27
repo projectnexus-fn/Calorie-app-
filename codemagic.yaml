@@ -5,9 +5,11 @@ workflows:
     environment:
       ios_signing:
         distribution_type: development
+        bundle_identifier: com.foodcalorieapp.ios
       vars:
         XCODE_WORKSPACE: "Package.swift"
         XCODE_SCHEME: "FoodCalorieApp"
+        BUNDLE_ID: "com.foodcalorieapp.ios"
       xcode: 15.0
       cocoapods: default
     scripts:
