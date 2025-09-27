@@ -1,0 +1,51 @@
+workflows:
+  ios-build-nosign:
+    name: iOS Build (No Code Signing)
+    max_build_duration: 30
+    environment:
+      xcode: 15.0
+      vars:
+        SCHEME_NAME: "FoodCalorieApp"
+        
+    scripts:
+      - name: List Available Schemes
+        script: |
+          echo "📋 Checking available schemes..."
+          swift package dump-package | grep -A 5 "targets"
+          
+      - name: Resolve Dependencies
+        script: |
+          echo "📦 Resolving Swift Package Manager dependencies..."
+          swift package resolve
+          
+      - name: Build for Simulator Only
+        script: |
+          echo "🔨 Building for iOS Simulator (no signing needed)..."
+          set -e
+          
+          # Build for simulator - no signing required
+          xcodebuild \
+            -scheme "$SCHEME_NAME" \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0' \
+            -configuration Debug \
+            build \
+            CODE_SIGNING_ALLOWED=NO \
+            AD_HOC_CODE_SIGNING_ALLOWED=NO
+            
+      - name: Verify Build Products
+        script: |
+          echo "✅ Verifying build was successful..."
+          find ~/Library/Developer/Xcode/DerivedData -name "*.app" -type d | head -5
+          echo "Build completed successfully! 🎉"
+          
+    artifacts:
+      - ~/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - ~/Library/Developer/Xcode/DerivedData/**/Logs/**/*.log
+      
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com
+        notify:
+          success: true
+          failure: true
